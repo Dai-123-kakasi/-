@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>暇つぶし屋</title>
+<meta name="description" content="人生に必要ないサイト集。サンドバッグくんを殴ってストレス発散、絶対に押すなボタン、クズ度診断、AI上司に怒られる。全部無料で今すぐ遊べます。">
+<meta property="og:title" content="暇つぶし屋 - 人生に必要ないサイト">
+<meta property="og:description" content="サンドバッグくんを殴ってストレス発散、絶対に押すなボタン、クズ度診断、AI上司に怒られる。意味はないけど、ちょっと楽しい。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://himatsubushiya-deploy.vercel.app/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="暇つぶし屋 - 人生に必要ないサイト">
+<meta name="twitter:description" content="サンドバッグくんを殴ってストレス発散、絶対に押すなボタン、クズ度診断、AI上司に怒られる。">
+<meta name="google-site-verification" content="oJfIVAbqIj-QC4XvPPBkZirhjLZUWfZ-p3CcRDLzfCI" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16130f;
+    --bg-spot: #201a13;
+    --ink: #f2ece1;
+    --ink-dim: #b9ada0;
+    --line: #423a2f;
+    --hit: #ff4d3d;
+    --hit-dim: #7a2a22;
+    --impact: #ffcc33;
+    --calm: #6fbf73;
+    --card: #1c1710;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(ellipse 900px 500px at 50% 0%, var(--bg-spot), var(--bg) 70%);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{ max-width:520px; margin:0 auto; }
+  header{ text-align:center; margin-bottom:22px; }
+  .eyebrow{ font-size:11px; letter-spacing:0.3em; color:var(--ink-dim); margin-bottom:6px; }
+  h1{
+    font-family:'Bungee', sans-serif;
+    font-weight:400;
+    font-size:clamp(26px,7vw,38px);
+    margin:0 0 6px;
+    color:var(--impact);
+    text-shadow: 3px 3px 0 var(--hit-dim);
+  }
+  .sub{ color:var(--ink-dim); font-size:13px; }
+
+  nav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin:22px 0 8px;
+  }
+  nav button{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-weight:700;
+    font-size:12px;
+    background:#241d14;
+    color:var(--ink-dim);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    cursor:pointer;
+  }
+  nav button.active{
+    background:var(--hit);
+    color:#20100c;
+    border-color:var(--hit);
+  }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* ---- HOME ---- */
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:16px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+    cursor:pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .card:hover{ border-color:var(--hit); transform: translateY(-2px); }
+  .card .glyph{ font-size:26px; margin-bottom:8px; }
+  .card .title{ font-weight:700; font-size:14px; margin-bottom:4px; }
+  .card .desc{ font-size:11.5px; color:var(--ink-dim); line-height:1.5; }
+
+  /* ---- SHARED GAME SHELL ---- */
+  .back{
+    background:none;
+    border:none;
+    color:var(--ink-dim);
+    font-size:12px;
+    cursor:pointer;
+    padding:0;
+    margin-bottom:16px;
+    text-decoration:underline;
+  }
+  .game-title{
+    font-family:'Bungee', sans-serif;
+    font-size:20px;
+    color:var(--impact);
+    margin:0 0 4px;
+  }
+  .game-sub{ color:var(--ink-dim); font-size:12.5px; margin-bottom:18px; }
+
+  /* ---- SANDBAG ---- */
+  .stage{ position:relative; width:min(260px,72vw); height:320px; margin:0 auto; display:flex; justify-content:center; }
+  .stage svg{ width:100%; height:100%; overflow:visible; }
+  .bag-wrap{ transform-origin: 50% 8%; }
+  .bag-wrap.swing{ animation: swing 0.55s ease-out; }
+  @keyframes swing{ 0%{transform:rotate(0deg);} 20%{transform:rotate(9deg);} 45%{transform:rotate(-6deg);} 70%{transform:rotate(3deg);} 100%{transform:rotate(0deg);} }
+  .impact-text{
+    position:absolute; font-family:'Bungee', sans-serif; font-size:22px; color:var(--impact);
+    -webkit-text-stroke: 1.5px var(--hit-dim); pointer-events:none; opacity:0; left:50%; top:32%;
+  }
+  .impact-text.show{ animation: pop 0.9s ease-out forwards; }
+  @keyframes pop{
+    0%{ transform:translate(-50%,0) scale(0.4) rotate(-8deg); opacity:0; }
+    15%{ transform:translate(-50%,-10px) scale(1.15) rotate(4deg); opacity:1; }
+    35%{ transform:translate(-50%,-14px) scale(1) rotate(0deg); opacity:1; }
+    100%{ transform:translate(-50%,-46px) scale(0.9) rotate(0deg); opacity:0; }
+  }
+  .durability{ width:min(320px,80vw); margin:14px auto 0; }
+  .durability .label{ display:flex; justify-content:space-between; font-size:11px; color:var(--ink-dim); margin-bottom:6px; }
+  .bar-track{ height:9px; border-radius:6px; background:#2a241c; border:1px solid var(--line); overflow:hidden; }
+  .bar-fill{ height:100%; width:100%; background:var(--calm); transition: width 0.4s ease, background 0.4s ease; }
+  .panel{ width:min(400px,90vw); margin:20px auto 0; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+  textarea{
+    width:100%; resize:none; height:56px; background:#100d09; border:1px solid var(--line); border-radius:10px;
+    color:var(--ink); font-family:inherit; font-size:14px; padding:10px 12px; line-height:1.5;
+  }
+  textarea:focus{ outline:none; border-color:var(--hit); }
+  .row{ display:flex; gap:8px; margin-top:8px; justify-content:flex-end; }
+  .primary-btn{
+    font-family:'Bungee', sans-serif; font-size:13px; background:var(--hit); color:#20100c; border:none;
+    border-radius:10px; padding:0 20px; height:36px; cursor:pointer;
+  }
+  .primary-btn:active{ transform: scale(0.95); }
+  .meta{ display:flex; justify-content:space-between; margin-top:10px; font-size:11px; color:var(--ink-dim); }
+  .link-btn{ background:none; border:none; color:var(--ink-dim); text-decoration:underline; font-size:11px; cursor:pointer; padding:0; }
+
+  /* ---- DO NOT PRESS ---- */
+  .press-zone{ text-align:center; padding:40px 0 10px; }
+  .big-red-btn{
+    width:140px; height:140px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #ff6a5c, var(--hit) 60%, var(--hit-dim) 100%);
+    border:4px solid #200f0b;
+    color:#20100c;
+    font-family:'Bungee', sans-serif;
+    font-size:14px;
+    cursor:pointer;
+    box-shadow: 0 8px 0 var(--hit-dim);
+  }
+  .big-red-btn:active{ transform: translateY(6px); box-shadow: 0 2px 0 var(--hit-dim); }
+  #pressMsg{ margin-top:24px; font-size:14px; min-height:44px; color:var(--ink); }
+  #pressCount{ margin-top:10px; font-size:11px; color:var(--ink-dim); }
+
+  .ach-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+    margin-top:26px; text-align:left;
+  }
+  .ach-badge{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:10px 6px; text-align:center; transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .ach-badge.unlocked{ border-color:var(--impact); }
+  .ach-badge.just-unlocked{ animation: badgePop 0.5s ease; }
+  @keyframes badgePop{ 0%{ transform:scale(0.7); } 50%{ transform:scale(1.12); } 100%{ transform:scale(1); } }
+  .ach-badge .ic{ font-size:20px; display:block; margin-bottom:4px; opacity:1; }
+  .ach-badge.locked .ic{ opacity:0.35; filter:grayscale(1); }
+  .ach-badge .name{ font-weight:700; font-size:10px; color:var(--ink); line-height:1.3; }
+  .ach-badge.locked .name{ color:var(--ink-dim); }
+  .ach-badge .need{ font-size:9px; color:var(--ink-dim); margin-top:2px; }
+
+  .ach-toast{
+    position:fixed; left:50%; bottom:26px; transform:translate(-50%, 16px);
+    background:var(--impact); color:#20100c; font-family:'Bungee', sans-serif; font-size:11.5px;
+    padding:10px 16px; border-radius:10px; opacity:0; pointer-events:none;
+    transition: opacity 0.3s ease, transform 0.3s ease; z-index:20; text-align:center;
+    box-shadow: 0 6px 0 var(--hit-dim);
+  }
+  .ach-toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+  /* ---- AI上司 ---- */
+  .boss-card{
+    display:flex; gap:12px; align-items:flex-start;
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:16px; margin-bottom:16px;
+  }
+  .boss-face{ font-size:34px; line-height:1; flex-shrink:0; }
+  .boss-bubble{
+    position:relative; background:#100d09; border:1px solid var(--line); border-radius:12px;
+    padding:12px 14px; font-size:13.5px; line-height:1.7; min-height:24px; white-space:pre-wrap;
+    color:var(--ink);
+  }
+  .boss-bubble.loading{ color:var(--ink-dim); font-style:italic; }
+  .boss-bubble.error{ color:var(--hit); }
+  .boss-panel{ width:100%; }
+  #bossInput{ width:100%; }
+
+  /* ---- QUIZ ---- */
+  .q-block{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:12px; }
+  .q-text{ font-size:13.5px; margin-bottom:10px; font-weight:700; }
+  .opts{ display:flex; flex-direction:column; gap:8px; }
+  .opt-btn{
+    text-align:left; background:#100d09; border:1px solid var(--line); border-radius:10px;
+    color:var(--ink); font-family:inherit; font-size:13px; padding:10px 12px; cursor:pointer;
+  }
+  .opt-btn.selected{ border-color:var(--hit); background:#2a1712; }
+  .result-card{
+    text-align:center; background:var(--card); border:1px solid var(--hit); border-radius:16px; padding:24px 16px; margin-top:10px;
+  }
+  .result-num{ font-family:'Bungee', sans-serif; font-size:44px; color:var(--impact); }
+  .result-tier{ font-size:15px; font-weight:700; margin-top:6px; }
+  .result-desc{ font-size:12px; color:var(--ink-dim); margin-top:8px; line-height:1.6; }
+
+  .footnote{ max-width:420px; margin:26px auto 0; text-align:center; font-size:11px; color:var(--ink-dim); line-height:1.7; opacity:0.75; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">人生に必要ないサイト</div>
+    <h1>暇つぶし屋</h1>
+    <div class="sub">意味はないけど、ちょっと楽しい。それだけでいい。</div>
+  </header>
+
+  <nav>
+    <button data-view="home" class="active">一覧</button>
+    <button data-view="sandbag">サンドバッグくん</button>
+    <button data-view="press">絶対に押すな</button>
+    <button data-view="quiz">クズ度診断</button>
+    <button data-view="aiboss">AI上司</button>
+  </nav>
+
+  <!-- HOME -->
+  <section class="view active" id="view-home">
+    <div class="grid">
+      <div class="card" data-go="sandbag">
+        <div class="glyph">🥊</div>
+        <div class="title">サンドバッグくん</div>
+        <div class="desc">言いたいことをぶつけて殴る。強く言うほどダメージ大。</div>
+      </div>
+      <div class="card" data-go="press">
+        <div class="glyph">🔴</div>
+        <div class="title">絶対に押すな</div>
+        <div class="desc">押すなと言われると押したくなる、あれ。</div>
+      </div>
+      <div class="card" data-go="quiz">
+        <div class="glyph">🧪</div>
+        <div class="title">クズ度診断</div>
+        <div class="desc">10問答えるだけ。完全に娯楽なので信じすぎ注意。</div>
+      </div>
+      <div class="card" data-go="aiboss">
+        <div class="glyph">😠</div>
+        <div class="title">AI上司に怒られる</div>
+        <div class="desc">どんな一言も、謎の説教に変換されます。</div>
+      </div>
+      <div class="card" style="opacity:0.5; cursor:default;">
+        <div class="glyph">🚧</div>
+        <div class="title">近日追加</div>
+        <div class="desc">増やしていく予定。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SANDBAG -->
+  <section class="view" id="view-sandbag">
+    <button class="back" data-go="home">← 一覧に戻る</button>
+    <h2 class="game-title">サンドバッグくん</h2>
+    <div class="game-sub">溜まったモヤモヤをここで吐き出そう。</div>
+
+    <div class="stage">
+      <svg id="bagSvg" viewBox="0 0 220 300">
+        <ellipse cx="110" cy="280" rx="46" ry="8" fill="#000" opacity="0.35"/>
+        <line x1="110" y1="0" x2="110" y2="46" stroke="#5b5346" stroke-width="3"/>
+        <g id="bagWrap" class="bag-wrap">
+          <rect x="70" y="44" width="80" height="200" rx="40" fill="#8a4b32" id="bagBody"/>
+          <rect x="70" y="44" width="80" height="200" rx="40" fill="url(#shade)" opacity="0.5"/>
+          <g id="tapes" opacity="0"></g>
+          <g id="cracks" stroke="#3a1f14" stroke-width="2" fill="none" opacity="0"></g>
+          <g id="face">
+            <circle cx="92" cy="118" r="6" fill="#20100c" id="eyeL"/>
+            <circle cx="128" cy="118" r="6" fill="#20100c" id="eyeR"/>
+            <path id="mouth" d="M95 148 Q110 156 125 148" stroke="#20100c" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </g>
+          <ellipse id="sand" cx="110" cy="248" rx="0" ry="0" fill="#c9a876" opacity="0"/>
+        </g>
+        <defs>
+          <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#000" stop-opacity="0.25"/>
+            <stop offset="0.5" stop-color="#000" stop-opacity="0"/>
+            <stop offset="1" stop-color="#000" stop-opacity="0.3"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div id="impactText" class="impact-text"></div>
+    </div>
+
+    <div class="durability">
+      <div class="label"><span>耐久度</span><span id="durNum">100</span></div>
+      <div class="bar-track"><div class="bar-fill" id="durFill"></div></div>
+    </div>
+
+    <div class="panel">
+      <textarea id="input" placeholder="ここに言いたいことを書いて「殴る」を押す"></textarea>
+      <div class="row"><button class="primary-btn" id="hitBtn">殴る</button></div>
+      <div class="meta">
+        <span id="hitCount">0 発</span>
+        <button class="link-btn" id="resetBtn">回復させる</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DO NOT PRESS -->
+  <section class="view" id="view-press">
+    <button class="back" data-go="home">← 一覧に戻る</button>
+    <h2 class="game-title">絶対に押すな</h2>
+    <div class="game-sub">それ以外、特に何もありません。</div>
+    <div class="press-zone">
+      <button class="big-red-btn" id="pressButton">押すな</button>
+      <div id="pressMsg">まだ何も起きていません。</div>
+      <div id="pressCount">0 回</div>
+      <div class="ach-grid" id="achGrid"></div>
+    </div>
+    <div class="ach-toast" id="achToast"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="view-quiz">
+    <button class="back" data-go="home">← 一覧に戻る</button>
+    <h2 class="game-title">クズ度診断</h2>
+    <div class="game-sub">10問、直感で選んでね。完全に娯楽です。</div>
+    <div id="quizArea"></div>
+  </section>
+
+  <!-- AI BOSS -->
+  <section class="view" id="view-aiboss">
+    <button class="back" data-go="home">← 一覧に戻る</button>
+    <h2 class="game-title">AI上司に怒られる</h2>
+    <div class="game-sub">何を報告しても、謎の理屈で説教されます。</div>
+
+    <div class="boss-card">
+      <div class="boss-face">😠</div>
+      <div class="boss-bubble" id="bossBubble">何か報告してみてください。</div>
+    </div>
+
+    <div class="panel boss-panel">
+      <textarea id="bossInput" placeholder="例：今日寝坊して遅刻しました"></textarea>
+      <div class="row"><button class="primary-btn" id="bossBtn">報告する</button></div>
+    </div>
+  </section>
+
+  <p class="footnote">
+    サンドバッグくんは実在の人物とは無関係の架空キャラクターです。クズ度診断は娯楽用の非公式な診断で、実際の性格や医学的な評価とは関係ありません。AI上司のみ、入力した内容をAIでの返答生成のために送信します。それ以外のコンテンツは、どこにも送信・保存されずブラウザの中だけで処理されます。
+  </p>
+</div>
+
+<script>
+(function(){
+  // ------- ナビゲーション -------
+  const views = document.querySelectorAll('.view');
+  const navBtns = document.querySelectorAll('nav button');
+
+  function goTo(name){
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  navBtns.forEach(b => b.addEventListener('click', () => goTo(b.dataset.view)));
+  document.querySelectorAll('[data-go]').forEach(el => {
+    el.addEventListener('click', () => goTo(el.dataset.go));
+  });
+
+  // ------- サンドバッグくん -------
+  (function(){
+    const input = document.getElementById('input');
+    const hitBtn = document.getElementById('hitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const durFill = document.getElementById('durFill');
+    const durNum = document.getElementById('durNum');
+    const hitCountEl = document.getElementById('hitCount');
+    const bagWrap = document.getElementById('bagWrap');
+    const bagBody = document.getElementById('bagBody');
+    const tapes = document.getElementById('tapes');
+    const cracks = document.getElementById('cracks');
+    const eyeL = document.getElementById('eyeL');
+    const eyeR = document.getElementById('eyeR');
+    const mouth = document.getElementById('mouth');
+    const sand = document.getElementById('sand');
+    const impactText = document.getElementById('impactText');
+
+    let damage = 0, hits = 0;
+
+    const MILD = ['ばか','バカ','あほ','アホ','だめ','ダメ','むかつく','ムカつく','うざい','ウザい','やだ','いや'];
+    const STRONG = ['しね','死ね','きえろ','消えろ','くたばれ','ごみ','ゴミ','くず','クズ','さいてい','最低','無能'];
+    const IMPACT_WORDS = ['ドカッ!!','ズガン!!','ボゴッ!!','ガツン!!','ズドン!!','バキッ!!'];
+
+    function scoreText(text){
+      if(!text.trim()) return 0;
+      let score = 6;
+      const len = text.length;
+      score += Math.min(len * 0.6, 18);
+      MILD.forEach(w => { if(text.includes(w)) score += 5; });
+      STRONG.forEach(w => { if(text.includes(w)) score += 12; });
+      const excl = (text.match(/[!！]/g) || []).length;
+      score += Math.min(excl * 3, 12);
+      const kana = (text.match(/[ぁ-んァ-ンｦ-ﾟ]/g) || []).length;
+      if(len > 0 && kana / len > 0.5) score += 4;
+      return Math.round(Math.min(score, 40));
+    }
+
+    function stageOf(d){ if(d<20) return 0; if(d<40) return 1; if(d<60) return 2; if(d<80) return 3; return 4; }
+    const STAGE_COLORS = ['#8a4b32','#7a4029','#6a3624','#552c1f','#3d2318'];
+    const STAGE_MOUTHS = [
+      'M95 148 Q110 156 125 148',
+      'M95 150 Q110 146 125 150',
+      'M95 152 Q110 140 125 152',
+      'M95 148 L125 158 M95 158 L125 148',
+      'M92 152 Q110 146 128 152'
+    ];
+
+    function renderTapes(stage){
+      tapes.innerHTML = '';
+      tapes.style.opacity = stage >= 2 ? 1 : 0;
+      const patches = [{x:76,y:90,r:14},{x:140,y:170,r:16},{x:88,y:210,r:13},{x:130,y:70,r:12},{x:110,y:230,r:15}];
+      const count = stage >= 3 ? 5 : (stage === 2 ? 2 : 0);
+      for(let i=0;i<count;i++){
+        const p = patches[i];
+        const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        rect.setAttribute('x', p.x - p.r/2);
+        rect.setAttribute('y', p.y - p.r/2.6);
+        rect.setAttribute('width', p.r);
+        rect.setAttribute('height', p.r/1.3);
+        rect.setAttribute('rx', 3);
+        rect.setAttribute('fill', '#d8cdb8');
+        rect.setAttribute('opacity', '0.85');
+        rect.setAttribute('transform', `rotate(${(i*37)%40 - 20} ${p.x} ${p.y})`);
+        tapes.appendChild(rect);
+      }
+    }
+    function renderCracks(stage){
+      cracks.style.opacity = stage >= 1 ? 1 : 0;
+      const paths = ['M100 90 L106 104 L98 116','M132 130 L124 142 L134 154','M90 190 L100 202 L92 214','M118 60 L112 72'];
+      cracks.innerHTML = '';
+      const count = Math.min(stage, paths.length);
+      for(let i=0;i<count;i++){
+        const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d', paths[i]);
+        cracks.appendChild(p);
+      }
+    }
+    function render(){
+      const stage = stageOf(damage);
+      bagBody.setAttribute('fill', STAGE_COLORS[stage]);
+      mouth.setAttribute('d', STAGE_MOUTHS[stage]);
+      const eyeSize = stage >= 4 ? 2.5 : 6;
+      eyeL.setAttribute('r', eyeSize); eyeR.setAttribute('r', eyeSize);
+      eyeL.setAttribute('cy', stage >= 4 ? 122 : 118); eyeR.setAttribute('cy', stage >= 4 ? 122 : 118);
+      renderCracks(stage); renderTapes(stage);
+      if(stage >= 4){ sand.setAttribute('rx', 20); sand.setAttribute('ry', 6); sand.setAttribute('opacity', 0.9); }
+      else { sand.setAttribute('opacity', 0); }
+      const shown = Math.max(0, 100 - damage);
+      durFill.style.width = shown + '%';
+      durNum.textContent = shown;
+      durFill.style.background = shown > 60 ? 'var(--calm)' : (shown > 30 ? 'var(--impact)' : 'var(--hit)');
+      hitCountEl.textContent = hits + ' 発';
+    }
+    function showImpact(){
+      const word = IMPACT_WORDS[Math.floor(Math.random()*IMPACT_WORDS.length)];
+      impactText.textContent = word;
+      impactText.classList.remove('show'); void impactText.offsetWidth; impactText.classList.add('show');
+      bagWrap.classList.remove('swing'); void bagWrap.offsetWidth; bagWrap.classList.add('swing');
+    }
+    function hit(){
+      const text = input.value;
+      const add = scoreText(text);
+      if(add <= 0) return;
+      damage = Math.min(100, damage + add);
+      hits += 1;
+      showImpact(); render();
+      input.value = ''; input.focus();
+    }
+    hitBtn.addEventListener('click', hit);
+    input.addEventListener('keydown', (e) => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); hit(); } });
+    resetBtn.addEventListener('click', () => { damage = 0; render(); });
+    setInterval(() => { if(damage > 0){ damage = Math.max(0, damage - 2); render(); } }, 4000);
+    render();
+  })();
+
+  // ------- 絶対に押すな -------
+  (function(){
+    const btn = document.getElementById('pressButton');
+    const msg = document.getElementById('pressMsg');
+    const countEl = document.getElementById('pressCount');
+    const achGrid = document.getElementById('achGrid');
+    const achToast = document.getElementById('achToast');
+    let count = 0;
+
+    const messages = [
+      '押しましたね。',
+      '本当に押すんですか？',
+      'まだ押しますか。',
+      'そうですか。',
+      '別に止めはしません。',
+      '暇なんですね。',
+      'その調子です。',
+      '意味は特にありません。',
+      'もうすぐです。',
+      'おめでとうございます。あなたは10回押しました。何も変わりません。'
+    ];
+
+    const ACHIEVEMENTS = [
+      { count:1,    icon:'🌱', name:'はじめの一押し' },
+      { count:10,   icon:'🙂', name:'素直じゃない' },
+      { count:30,   icon:'😤', name:'好奇心の勝利' },
+      { count:50,   icon:'😵', name:'意志薄弱' },
+      { count:100,  icon:'💀', name:'もう戻れない' },
+      { count:300,  icon:'🔥', name:'完全に中毒' },
+      { count:1000, icon:'👑', name:'伝説の押し人' },
+    ];
+    let unlocked = new Set();
+    let toastQueue = [];
+    let toastShowing = false;
+
+    function renderAchievements(justUnlockedCount){
+      achGrid.innerHTML = '';
+      ACHIEVEMENTS.forEach(a => {
+        const isUnlocked = unlocked.has(a.count);
+        const badge = document.createElement('div');
+        badge.className = 'ach-badge ' + (isUnlocked ? 'unlocked' : 'locked');
+        if(isUnlocked && a.count === justUnlockedCount) badge.classList.add('just-unlocked');
+        badge.innerHTML = `
+          <span class="ic">${isUnlocked ? a.icon : '❓'}</span>
+          <div class="name">${isUnlocked ? a.name : '？？？'}</div>
+          <div class="need">${isUnlocked ? a.count + '回' : '???'}</div>
+        `;
+        achGrid.appendChild(badge);
+      });
+    }
+
+    function queueToast(text){
+      toastQueue.push(text);
+      if(!toastShowing) showNextToast();
+    }
+    function showNextToast(){
+      if(toastQueue.length === 0){ toastShowing = false; return; }
+      toastShowing = true;
+      const text = toastQueue.shift();
+      achToast.textContent = '🏆 実績解除：' + text;
+      achToast.classList.add('show');
+      setTimeout(() => {
+        achToast.classList.remove('show');
+        setTimeout(showNextToast, 300);
+      }, 1600);
+    }
+
+    function checkAchievements(){
+      let last = null;
+      ACHIEVEMENTS.forEach(a => {
+        if(count >= a.count && !unlocked.has(a.count)){
+          unlocked.add(a.count);
+          queueToast(a.name);
+          last = a.count;
+        }
+      });
+      renderAchievements(last);
+    }
+
+    btn.addEventListener('click', () => {
+      count++;
+      const idx = Math.min(count - 1, messages.length - 1);
+      msg.textContent = messages[idx];
+      countEl.textContent = count + ' 回';
+      btn.style.transform = 'scale(0.9) rotate(' + (Math.random()*10-5) + 'deg)';
+      setTimeout(() => { btn.style.transform = ''; }, 150);
+      checkAchievements();
+    });
+
+    renderAchievements();
+  })();
+
+  // ------- クズ度診断 -------
+  (function(){
+    const questions = [
+      { q:'朝起きてまず何をする？', opts:[['スマホをだらだら見る',2],['もう少し二度寝する',2],['すぐ起きる',0]] },
+      { q:'借りたもの、返し忘れたことある？', opts:[['よくある',2],['たまにある',1],['ない',0]] },
+      { q:'LINEの既読スルー、平気な方？', opts:[['得意',2],['たまにやる',1],['無理・気になる',0]] },
+      { q:'遅刻しそうな時、言い訳はとっさに出てくる？', opts:[['得意',2],['まあまあ',1],['正直に謝る',0]] },
+      { q:'皿洗いや片付け、後回しにしがち？', opts:[['いつも',2],['たまに',1],['すぐやる',0]] },
+      { q:'人の話、最後まで聞ける方？', opts:[['よく遮ってしまう',2],['たまに遮る',1],['ちゃんと聞く',0]] },
+      { q:'締切、どのタイプ？', opts:[['ギリギリ派',2],['半々',1],['余裕を持つ派',0]] },
+      { q:'「今から行く」と言ってから家を出るまで平均何分？', opts:[['10分以上',2],['3〜5分',1],['すぐ出る',0]] },
+      { q:'部屋の掃除は？', opts:[['気が向いた時だけ',2],['たまに定期的に',1],['毎日やる',0]] },
+      { q:'最近、何かを人のせいにしたことある？', opts:[['よくある',2],['たまにある',1],['ない',0]] },
+    ];
+    const answers = new Array(questions.length).fill(null);
+    const area = document.getElementById('quizArea');
+
+    function renderQuiz(){
+      area.innerHTML = '';
+      questions.forEach((item, qi) => {
+        const block = document.createElement('div');
+        block.className = 'q-block';
+        const qt = document.createElement('div');
+        qt.className = 'q-text';
+        qt.textContent = (qi+1) + '. ' + item.q;
+        block.appendChild(qt);
+        const opts = document.createElement('div');
+        opts.className = 'opts';
+        item.opts.forEach((opt, oi) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'opt-btn' + (answers[qi] === oi ? ' selected' : '');
+          b.textContent = opt[0];
+          b.addEventListener('click', () => {
+            answers[qi] = oi;
+            renderQuiz();
+            if(answers.every(a => a !== null)) showResult();
+          });
+          opts.appendChild(b);
+        });
+        block.appendChild(opts);
+        area.appendChild(block);
+      });
+    }
+
+    function showResult(){
+      const total = answers.reduce((sum, oi, qi) => sum + questions[qi].opts[oi][1], 0);
+      const pct = Math.round(total / (questions.length * 2) * 100);
+      let tier, desc;
+      if(pct <= 30){ tier = '天使レベル'; desc = 'かなり健全です。むしろ心配になるレベル。'; }
+      else if(pct <= 60){ tier = '平均的な人間'; desc = 'ごく普通です。誰でもこれくらいはある。'; }
+      else if(pct <= 85){ tier = 'なかなかの仕上がり'; desc = '堂々としています。周りは薄々気づいているかも。'; }
+      else { tier = '伝説級のクズ（誇っていい）'; desc = 'ここまで来ると逆に才能です。'; }
+
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <div style="font-size:12px;color:var(--ink-dim);">あなたのクズ度</div>
+        <div class="result-num">${pct}%</div>
+        <div class="result-tier">${tier}</div>
+        <div class="result-desc">${desc}<br>※完全に娯楽の診断です。信じすぎないでください。</div>
+        <div class="row" style="justify-content:center; margin-top:14px;">
+          <button class="primary-btn" id="retryQuiz">もう一回やる</button>
+        </div>
+      `;
+      area.appendChild(card);
+      document.getElementById('retryQuiz').addEventListener('click', () => {
+        for(let i=0;i<answers.length;i++) answers[i] = null;
+        renderQuiz();
+      });
+    }
+
+    renderQuiz();
+  })();
+
+  // ------- AI上司 -------
+  (function(){
+    const input = document.getElementById('bossInput');
+    const btn = document.getElementById('bossBtn');
+    const bubble = document.getElementById('bossBubble');
+
+    async function ask(text){
+      const response = await fetch("/api/boss", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      const data = await response.json();
+      if(!response.ok || !data.reply) throw new Error(data.error || 'no response');
+      return data.reply;
+    }
+
+    async function submit(){
+      const text = input.value.trim();
+      if(!text) return;
+      btn.disabled = true;
+      bubble.className = 'boss-bubble loading';
+      bubble.textContent = 'AI上司が考え中...';
+      try{
+        const reply = await ask(text);
+        bubble.className = 'boss-bubble';
+        bubble.textContent = reply;
+      }catch(err){
+        bubble.className = 'boss-bubble error';
+        bubble.textContent = '（AI上司は今、席を外しているようです。もう一度試してください）';
+      }finally{
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); submit(); }
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>
